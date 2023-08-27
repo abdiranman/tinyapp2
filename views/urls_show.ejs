@@ -10,7 +10,6 @@
     />
     <title>URL - TinyApp Example</title>
   </head>
-
   <body>
     <%- include ('partials/_header') %>
     <div class="card text-center">
@@ -20,7 +19,7 @@
         <form method="POST" action="/urls/<%= id %>">
           <div class="form-group">
             <label for="longURLInput">New Long URL:</label>
-            <input type="text" class="form-control" id="longURLInput" name="longURL" value="<%= longURL.longURL %>">
+            <input type="text" class="form-control" id="longURLInput" name="longURL" value="<%= longURL %>">
           </div>
           <button type="submit" class="btn btn-primary">Update URL</button>
         </form>

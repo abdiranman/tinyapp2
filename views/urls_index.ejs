@@ -6,7 +6,6 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -31,7 +30,7 @@
           <% for (let id in urls) { %>
             <tr>
               <td><%= id %></td>
-              <td><%= urls[id].longURL %></td>
+              <td><%= urls[id] %></td>
               <td>
                 <form method="POST" action="/urls/<%= id %>/delete">
                 <input type="hidden" name="_method" value="DELETE">
