@@ -1,12 +1,17 @@
 const express = require("express");
 const app = express();
-const cookieParser = require('cookie-parser');
+//const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const PORT = 8080;
 
 app.set("view engine", "ejs");
 
-app.use(cookieParser());
+app.use(cookieSession({
+    name: 'session', // Name of the cookie
+    keys: ['secret-key'], // Array of keys for encryption
+    maxAge: 24 * 60 * 60 * 1000, // Cookie expiration time in milliseconds (1 day)
+  }));
 app.use(express.urlencoded({ extended: true }));
 
 // Function to generate a random string for short URLs
@@ -70,9 +75,7 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
+
 
 // JSON endpoint for the URL database
 app.get("/urls.json", (req, res) => {
@@ -84,7 +87,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-    const userId = req.cookies["user_id"];
+    const userId = req.session.user_id;
 
     // Check if user is logged in
     if (!userId) {
@@ -104,7 +107,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-    const userId = req.cookies['user_id'];
+    const userId = req.session.user_id;
 
     // This is used to check if the user exists
     if (!userId) {
@@ -123,7 +126,7 @@ app.get("/urls/new", (req, res) => {
 );
 
 app.get("/urls/:id", (req, res) => {
-    const userId = req.cookies["user_id"];
+    const userId = req.session.user_id;
 
     // Check if user is logged in
     if (!userId) {
@@ -151,7 +154,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   // This is used to get the userId from the cookies
-const userId = req.cookies['user_id'];
+  const userId = req.session.user_id;
 
 // This is used to check if the user exists
 if (!userId) {
@@ -194,7 +197,8 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const user = getUserByEmail(email);
   if (user && bcrypt.compareSync(password, user.password)) {
-    res.cookie("user_id", user.id);
+   // This is used to set the cookie to the user id
+req.session.user_id = user.id;
     res.redirect("/urls");
   } else {
     res.status(400).send("User not found");
@@ -202,12 +206,12 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+    req.session = null;
   res.redirect("/login");
 });
 
 app.get("/register", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+    const user = users[req.session["user_id"]];
   if (user) {
     res.redirect("/urls");
   } else {
@@ -237,15 +241,19 @@ app.post('/register', (req, res) => {
     password: hashedPassword // This is used to hash the password and store it rather than the plain text password
   };
   users[id] = newUser;
-  res.cookie("user_id", id);
+  req.session.user_id = id;
   res.redirect("/urls");
 });
 
 app.get("/login", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+    const user = users[req.session["user_id"]];
   if (user) {
     res.redirect("/urls");
   } else {
     res.render("login");
   }
 });
+
+app.listen(PORT, () => {
+    console.log(`Example app listening on port ${PORT}!`);
+  });
