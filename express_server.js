@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs");
 const PORT = 8080;
 
 app.set("view engine", "ejs");
@@ -192,7 +193,7 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const user = getUserByEmail(email);
-  if (user) {
+  if (user && bcrypt.compareSync(password, user.password)) {
     res.cookie("user_id", user.id);
     res.redirect("/urls");
   } else {
@@ -226,10 +227,14 @@ app.post('/register', (req, res) => {
     res.status(400).send("Email is already in the database");
     return;
   }
+
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+// This is used to create a new user object
   const newUser = {
     id,
     email,
-    password
+    password: hashedPassword // This is used to hash the password and store it rather than the plain text password
   };
   users[id] = newUser;
   res.cookie("user_id", id);
