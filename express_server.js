@@ -1,37 +1,45 @@
 const express = require("express");
 const app = express();
 //const cookieParser = require('cookie-parser');
-const cookieSession = require('cookie-session')
+const cookieSession = require("cookie-session")
 const bcrypt = require("bcryptjs");
 const PORT = 8080;
 
 app.set("view engine", "ejs");
 
-app.use(cookieSession({
-    name: 'session', // Name of the cookie
-    keys: ['secret-key'], // Array of keys for encryption
-    maxAge: 24 * 60 * 60 * 1000, // Cookie expiration time in milliseconds (1 day)
-  }));
+app.use(
+    cookieSession({
+      name: "session",
+      keys: [`key1`],
+  
+      // Cookie Options
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    })
+  );
 app.use(express.urlencoded({ extended: true }));
 
 // Function to generate a random string for short URLs
 const generateRandomString = () => {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
   for (let i = 0; i < 6; i++) {
     result += chars[Math.floor(Math.random() * chars.length)];
   }
   return result;
 };
 
-// Function to get user by email from the users object
-const getUserByEmail = (email) => {
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      return users[userId];
-    }
-  }
-};
+//// Original function before refactoring
+
+// const getUserByEmail = (email) => {
+//   for (const userId in users) {
+//     if (users[userId].email === email) {
+//       return users[userId];
+//     }
+//   }
+// };
+
+// Refactored function required to be used from the helpers.js file
+const { getUserByEmail } = require("./helpers");
 
 const urlsForUser = (id) => {
     const filteredUrls = {};
@@ -49,13 +57,13 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "purple-monkey-dinosaur",
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
+    password: "dishwasher-funk",
+  },
 };
 
 // URL database
@@ -101,7 +109,7 @@ app.get("/urls", (req, res) => {
     
   const templateVars = {
     urls: userURL,
-    user
+    user,
   };
   res.render("urls_index", templateVars);
 });
@@ -117,7 +125,7 @@ app.get("/urls/new", (req, res) => {
       const user = users[userId];
     
       const templateVars = {
-        user
+        user,
       };
     }
     
@@ -144,11 +152,11 @@ app.get("/urls/:id", (req, res) => {
     
     // const user = users[userId];
     
-  const templateVars = { 
-    id: req.params.id, 
-    longURL: url.longURL,
-    user: users[userID]
-  };
+    const templateVars = {
+        id: req.params.id,
+        longURL: url.longURL,
+        user: users[userId],
+      };
   res.render("urls_show", templateVars);
 });
 
@@ -164,7 +172,7 @@ if (!userId) {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: userId
+    userID: userId,
   };
   
   res.redirect(`/urls/${shortURL}`);
@@ -219,7 +227,7 @@ app.get("/register", (req, res) => {
   }
 });
 
-app.post('/register', (req, res) => {
+app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
@@ -238,7 +246,7 @@ app.post('/register', (req, res) => {
   const newUser = {
     id,
     email,
-    password: hashedPassword // This is used to hash the password and store it rather than the plain text password
+    password: hashedPassword, // This is used to hash the password and store it rather than the plain text password
   };
   users[id] = newUser;
   req.session.user_id = id;
