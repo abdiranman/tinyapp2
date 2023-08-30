@@ -32,4 +32,5 @@ const generateRandomString = () => {
   module.exports = {
     generateRandomString,
     urlsForUser,
+    getUserByEmail,
   };
