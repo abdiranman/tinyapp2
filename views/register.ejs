@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
-	<title>Register</title>
+  <meta charset="UTF-8">
+  <title>Register</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 </head>
 <body>
-	<h1>Register</h1>
-	<form method="post" action="/register">
-		<label>Email:</label>
-		<input type="email" name="email" required><br><br>
-		<label>Password:</label>
-		<input type="password" name="password" required><br><br>
-		<input type="submit" value="Register">
-	</form>
+  <!-- Include header partial -->
+  <%- include('partials/_header') %>
+
+  <h1>Register</h1>
+
+  <form action="/register" method="POST">
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
 </body>
 </html>
